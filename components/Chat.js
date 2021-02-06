@@ -48,13 +48,14 @@ export default class Chat extends Component {
 
     if (!firebase.apps.length) {
       firebase.initializeApp({
-        apiKey: "AIzaSyA5LJNBLFMVgZTWvfH73fqRaiFLwCOjWmM",
-        authDomain: "test-d614c.firebaseapp.com",
-        databaseURL: "https://test-d614c.firebaseio.com",
-        projectId: "test-d614c",
-        storageBucket: "test-d614c.appspot.com",
-        messagingSenderId: "799483602316",
-        appId: "1:799483602316:web:0eaaf90d0b214244b822a9"
+        apiKey: "AIzaSyCVSLGXX7Te3NAPhG-jYbUe-8UPxNUeexM",
+        authDomain: "chatapp-b6157.firebaseapp.com",
+        databaseURL: "https://chatapp-b6157.firebaseio.com",
+        projectId: "chatapp-b6157",
+        storageBucket: "chatapp-b6157.appspot.com",
+        messagingSenderId: "828054549169",
+        appId: "1:828054549169:web:85233346327d0c638aa890",
+        measurementId: "G-2Q62Y91C7E",
       });
     }
 
@@ -64,13 +65,13 @@ export default class Chat extends Component {
       messages: [],
       uid: 0,
       isConnected: false,
-      image: null
+      image: null,
     };
   }
 
   /**
    * loads all messages from AsyncStorage
-   * @function getMessages 
+   * @function getMessages
    * @async
    * @return {Promise<string>} The data from the storage
    */
@@ -79,7 +80,7 @@ export default class Chat extends Component {
     try {
       messages = (await AsyncStorage.getItem("messages")) || [];
       this.setState({
-        messages: JSON.parse(messages)
+        messages: JSON.parse(messages),
       });
     } catch (error) {
       console.log(error.message);
@@ -88,7 +89,7 @@ export default class Chat extends Component {
 
   /**
    * saves all messages from AsyncStorage
-   * @function saveMessages 
+   * @function saveMessages
    * @async
    */
   saveMessages = async () => {
@@ -136,27 +137,27 @@ export default class Chat extends Component {
     // happens, which in this case would be when the connectivity status
     // changes. The function you give to addEventListener will be called with
     // the "state" object, which has properties on it like "isConnected".
-    NetInfo.addEventListener(state => {
+    NetInfo.addEventListener((state) => {
       this.handleConnectivityChange(state);
     });
 
-    NetInfo.fetch().then(state => {
+    NetInfo.fetch().then((state) => {
       const isConnected = state.isConnected;
       if (isConnected) {
         this.setState({
-          isConnected: true
+          isConnected: true,
         });
 
         this.authUnsubscribe = firebase
           .auth()
-          .onAuthStateChanged(async user => {
+          .onAuthStateChanged(async (user) => {
             if (!user) {
               await firebase.auth().signInAnonymously();
             }
 
             this.setState({
               uid: user.uid,
-              messages: []
+              messages: [],
             });
 
             this.unsubscribe = this.referenceChatMessages
@@ -165,7 +166,7 @@ export default class Chat extends Component {
           });
       } else {
         this.setState({
-          isConnected: false
+          isConnected: false,
         });
 
         this.getMessages();
@@ -196,10 +197,10 @@ export default class Chat extends Component {
    * @param {number} location.longitude
    * @param {number} location.latitude
    */
-  onCollectionUpdate = querySnapshot => {
+  onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // go through each document
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       // get the QueryDocumentSnapshot's data
       const data = doc.data();
       messages.push({
@@ -208,12 +209,12 @@ export default class Chat extends Component {
         createdAt: data.createdAt.toDate(),
         user: data.user,
         image: data.image || null,
-        location: data.location || null
+        location: data.location || null,
       });
     });
 
     this.setState({
-      messages
+      messages,
     });
   };
 
@@ -221,18 +222,18 @@ export default class Chat extends Component {
    * checks networkstatus of user
    * @function handleConnectivityChange
    */
-  handleConnectivityChange = state => {
+  handleConnectivityChange = (state) => {
     const isConnected = state.isConnected;
     if (isConnected == true) {
       this.setState({
-        isConnected: true
+        isConnected: true,
       });
       this.unsubscribe = this.referenceChatMessages
         .orderBy("createdAt", "desc")
         .onSnapshot(this.onCollectionUpdate);
     } else {
       this.setState({
-        isConnected: false
+        isConnected: false,
       });
     }
   };
@@ -258,13 +259,13 @@ export default class Chat extends Component {
       createdAt: message.createdAt,
       user: message.user,
       image: message.image || null,
-      location: message.location || null
+      location: message.location || null,
     });
   };
   //define title in navigation bar
   static navigationOptions = ({ navigation }) => {
     return {
-      title: `${navigation.state.params.userName}'s Chat`
+      title: `${navigation.state.params.userName}'s Chat`,
     };
   };
 
@@ -275,8 +276,8 @@ export default class Chat extends Component {
    */
   onSend = (messages = []) => {
     this.setState(
-      previousState => ({
-        messages: GiftedChat.append(previousState.messages, messages)
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
       }),
       () => {
         this.addMessage();
@@ -285,23 +286,23 @@ export default class Chat extends Component {
     );
   };
 
- /**
-  * hides inputbar when offline
-  * @function renderInputToolbar
-  */
-  renderInputToolbar = props => {
+  /**
+   * hides inputbar when offline
+   * @function renderInputToolbar
+   */
+  renderInputToolbar = (props) => {
     console.log("renderInputToolbar --> props", props.isConnected);
     if (props.isConnected === false) {
     } else {
       return <InputToolbar {...props} />;
     }
   };
-  
- /**
-  * displays the communication features
-  * @function renderCustomActions
-  */
-  renderCustomActions = props => <CustomActions {...props} />;
+
+  /**
+   * displays the communication features
+   * @function renderCustomActions
+   */
+  renderCustomActions = (props) => <CustomActions {...props} />;
 
   //custom map view
   renderCustomView(props) {
@@ -314,7 +315,7 @@ export default class Chat extends Component {
             latitude: currentMessage.location.latitude,
             longitude: currentMessage.location.longitude,
             latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
+            longitudeDelta: 0.0421,
           }}
         />
       );
@@ -329,7 +330,7 @@ export default class Chat extends Component {
       <View
         style={{
           flex: 1,
-          backgroundColor: this.props.navigation.state.params.backgroundColor
+          backgroundColor: this.props.navigation.state.params.backgroundColor,
         }}
       >
         <GiftedChat
@@ -338,9 +339,9 @@ export default class Chat extends Component {
           renderInputToolbar={this.renderInputToolbar}
           renderActions={this.renderCustomActions}
           renderCustomView={this.renderCustomView}
-          onSend={messages => this.onSend(messages)}
+          onSend={(messages) => this.onSend(messages)}
           user={{
-            _id: this.state.uid
+            _id: this.state.uid,
           }}
         />
         {Platform.OS === "android" ? <KeyboardSpacer /> : null}
